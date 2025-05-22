@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_assign_nearest_warehouse" 
+                        string="Chọn kho gần nhất" 
+                        type="object" 
+                        attrs="{'invisible': ['|', ('state', 'not in', ['draft', 'sent']), ('auto_warehouse_selection', '=', False)]}"
+                        class="btn-primary"
+                        help="Automatically select the closest warehouse based on customer's GPS location"/>
+            </xpath>
+            
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="auto_warehouse_selection" widget="boolean_toggle"/>
+                <field name="warehouse_selection_date" readonly="1" attrs="{'invisible': [('warehouse_selection_date', '=', False)]}"/>
+            </xpath>
+            
+            <xpath expr="//field[@name='order_line']/tree//field[@name='product_id']" position="after">
+                <field name="warehouse_id" optional="show"/>
+            </xpath>
+            
+            <xpath expr="//notebook" position="inside">
+                <page string="Warehouse Selection" name="warehouse_selection" attrs="{'invisible': [('auto_warehouse_selection', '=', False)]}">
+                    <group>
+                        <group string="GPS Configuration">
+                            <field name="partner_shipping_id" readonly="1"/>
+                            <label for="partner_shipping_id"/>
+                            <div class="o_row">
+                                <field name="partner_shipping_id" readonly="1" invisible="1"/>
+                                <field name="partner_shipping_id" readonly="1" widget="many2one_avatar_user" context="{'show_address': 1}" options="{'always_reload': True}"/>
+                            </div>
+                            <field name="warehouse_id" readonly="1"/>
+                        </group>
+                        <group string="Customer GPS Data" attrs="{'invisible': ['|', ('partner_shipping_id', '=', False), '&amp;', ('partner_shipping_id.latitude', '=', 0.0), ('partner_shipping_id.longitude', '=', 0.0)]}">
+                            <field name="partner_shipping_id.latitude" readonly="1" string="Latitude"/>
+                            <field name="partner_shipping_id.longitude" readonly="1" string="Longitude"/>
+                            <button name="action_view_customer_on_map" string="View on Map" type="object" class="btn-primary" 
+                                    attrs="{'invisible': ['|', ('partner_shipping_id.latitude', '=', 0.0), ('partner_shipping_id.longitude', '=', 0.0)]}"/>
+                        </group>
+                    </group>
+                    <group string="Selected Warehouses" attrs="{'invisible': [('warehouse_selection_date', '=', False)]}">
+                        <field name="order_line" readonly="1" domain="[('order_id', '=', active_id)]" context="{'show_warehouse': 1}">
+                            <tree>
+                                <field name="product_id"/>
+                                <field name="product_uom_qty"/>
+                                <field name="warehouse_id"/>
+                                <field name="route_id"/>
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Add filter for orders with auto warehouse selection -->
+    <record id="view_sales_order_filter_inherit" model="ir.ui.view">
+        <field name="name">sale.order.list.select.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
+                <filter string="Auto Warehouse Selection" name="auto_warehouse_filter" domain="[('auto_warehouse_selection', '=', True)]"/>
+                <filter string="Warehouse Selected" name="warehouse_selected_filter" domain="[('warehouse_selection_date', '!=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

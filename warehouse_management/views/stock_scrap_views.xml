@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="stock_scrap_form_view_inherit" model="ir.ui.view">
+        <field name="name">stock.scrap.form.inherit</field>
+        <field name="model">stock.scrap</field>
+        <field name="inherit_id" ref="stock.stock_scrap_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='scrap_location_id']" position="before">
+                <field name="scrap_category_id" options="{'no_create': True, 'no_open': True}" 
+                       placeholder="Select a scrap category..." 
+                       attrs="{'invisible': [('state', '=', 'done')]}"/>
+                <field name="scrap_type" widget="radio"/>
+            </xpath>
+            
+            <xpath expr="//field[@name='scrap_location_id']" position="after">
+                <field name="scrap_reason" placeholder="Reason for scrapping..." attrs="{'invisible': [('state', '=', 'done')]}"/>
+                <field name="requires_action" attrs="{'invisible': [('scrap_type', '=', 'disposal')]}"/>
+                <field name="action_responsible_id" attrs="{'invisible': [('requires_action', '=', False)], 'required': [('requires_action', '=', True)]}"/>
+                <field name="estimated_repair_cost" attrs="{'invisible': [('scrap_type', '!=', 'repair')]}"/>
+                <field name="return_picking_id" attrs="{'invisible': [('return_picking_id', '=', False)]}" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="stock_scrap_view_search_inherit" model="ir.ui.view">
+        <field name="name">stock.scrap.search.inherit</field>
+        <field name="model">stock.scrap</field>
+        <field name="inherit_id" ref="stock.stock_scrap_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="scrap_type"/>
+                <field name="scrap_category_id"/>
+                <field name="action_responsible_id"/>
+                <field name="scrap_reason"/>
+                <filter string="Hàng bỏ" name="disposal" domain="[('scrap_type', '=', 'disposal')]"/>
+                <filter string="Hàng sửa chữa" name="repair" domain="[('scrap_type', '=', 'repair')]"/>
+                <filter string="Hàng trả" name="return" domain="[('scrap_type', '=', 'return')]"/>
+                <filter string="Yêu cầu xử lý" name="requires_action" domain="[('requires_action', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Loại hàng lỗi" name="groupby_scrap_type" domain="[]" context="{'group_by': 'scrap_type'}"/>
+                    <filter string="Danh mục" name="groupby_category" domain="[]" context="{'group_by': 'scrap_category_id'}"/>
+                    <filter string="Người phụ trách" name="groupby_responsible" domain="[]" context="{'group_by': 'action_responsible_id'}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="stock_scrap_tree_view_inherit" model="ir.ui.view">
+        <field name="name">stock.scrap.tree.inherit</field>
+        <field name="model">stock.scrap</field>
+        <field name="inherit_id" ref="stock.stock_scrap_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='scrap_location_id']" position="after">
+                <field name="scrap_type"/>
+                <field name="scrap_category_id" optional="show"/>
+                <field name="requires_action"/>
+                <field name="action_responsible_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Stock Scrap Category Views -->
+    <record id="stock_scrap_category_form_view" model="ir.ui.view">
+        <field name="name">stock.scrap.category.form</field>
+        <field name="model">stock.scrap.category</field>
+        <field name="arch" type="xml">
+            <form string="Scrap Category">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="Category Name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="default_scrap_type"/>
+                        </group>
+                        <group>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="note" placeholder="Additional notes about this category..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="stock_scrap_category_tree_view" model="ir.ui.view">
+        <field name="name">stock.scrap.category.tree</field>
+        <field name="model">stock.scrap.category</field>
+        <field name="arch" type="xml">
+            <tree string="Scrap Categories">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="default_scrap_type"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="stock_scrap_category_search_view" model="ir.ui.view">
+        <field name="name">stock.scrap.category.search</field>
+        <field name="model">stock.scrap.category</field>
+        <field name="arch" type="xml">
+            <search string="Search Scrap Categories">
+                <field name="name"/>
+                <field name="code"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Default Type" name="groupby_type" domain="[]" context="{'group_by': 'default_scrap_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <record id="action_stock_scrap_category" model="ir.actions.act_window">
+        <field name="name">Danh mục hàng lỗi</field>
+        <field name="res_model">stock.scrap.category</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new scrap category
+            </p>
+        </field>
+    </record>
+    
+    <!-- Add menu item for scrap categories -->
+    <menuitem id="menu_stock_scrap_category"
+              name="Danh mục hàng lỗi"
+              parent="stock.menu_stock_inventory_control"
+              action="action_stock_scrap_category"
+              sequence="11"/>
+</odoo>

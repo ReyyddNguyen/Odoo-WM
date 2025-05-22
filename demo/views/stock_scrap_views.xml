@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="stock_scrap_form_view_inherit" model="ir.ui.view">
+        <field name="name">stock.scrap.form.inherit</field>
+        <field name="model">stock.scrap</field>
+        <field name="inherit_id" ref="stock.stock_scrap_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='scrap_location_id']" position="before">
+                <field name="scrap_type" widget="radio"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="stock_scrap_tree_view_inherit" model="ir.ui.view">
+        <field name="name">stock.scrap.tree.inherit</field>
+        <field name="model">stock.scrap</field>
+        <field name="inherit_id" ref="stock.stock_scrap_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="scrap_type" string="Loại hàng lỗi"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_scrap_search_view_inherit" model="ir.ui.view">
+        <field name="name">stock.scrap.search.inherit</field>
+        <field name="model">stock.scrap</field>
+        <field name="inherit_id" ref="stock.stock_scrap_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="scrap_type"/>
+            </xpath>
+            <xpath expr="//filter[@name='product']" position="after">
+                <filter string="Hàng bỏ" name="disposal" domain="[('scrap_type', '=', 'disposal')]"/>
+                <filter string="Hàng sửa chữa" name="repair" domain="[('scrap_type', '=', 'repair')]"/>
+                <filter string="Hàng trả" name="return" domain="[('scrap_type', '=', 'return')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Loại hàng lỗi" name="groupby_scrap_type" domain="[]" context="{'group_by': 'scrap_type'}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo> 

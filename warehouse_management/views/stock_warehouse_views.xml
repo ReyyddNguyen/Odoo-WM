@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_warehouse_inherit" model="ir.ui.view">
+        <field name="name">stock.warehouse.form.inherit</field>
+        <field name="model">stock.warehouse</field>
+        <field name="inherit_id" ref="stock.view_warehouse"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="latitude" string="Vĩ độ"/>
+                <field name="longitude" string="Kinh độ"/>
+                <field name="active_gps_routing"/>
+                <field name="min_stock_percent"/>
+                <field name="priority"/>
+            </xpath>
+            
+            <xpath expr="//notebook" position="inside">
+                <page string="GPS Configuration" name="gps_config">
+                    <group>
+                        <group string="GPS Settings">
+                            <field name="latitude" string="Vĩ độ (Latitude)"/>
+                            <field name="longitude" string="Kinh độ (Longitude)"/>
+                            <field name="active_gps_routing"/>
+                        </group>
+                        <group string="Auto-selection Settings">
+                            <field name="min_stock_percent"/>
+                            <field name="priority"/>
+                            <button name="action_test_gps_routing" string="Test GPS Routing" type="object" 
+                                    class="btn-primary" attrs="{'invisible': [('active_gps_routing', '=', False)]}"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Add a filter for warehouses with GPS routing enabled -->
+    <record id="view_warehouse_filter_inherit" model="ir.ui.view">
+        <field name="name">stock.warehouse.search.inherit</field>
+        <field name="model">stock.warehouse</field>
+        <field name="inherit_id" ref="stock.view_warehouse_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="after">
+                <filter string="GPS Routing Enabled" name="gps_routing" domain="[('active_gps_routing', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

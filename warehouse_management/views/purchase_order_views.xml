@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="purchase_order_form_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <div attrs="{'invisible': ['|', ('company_id', '=', False), '&amp;', ('partner_id', '=', False), ('partner_id.is_external_vendor', '=', False)]}" class="alert alert-warning" role="alert" style="margin-bottom:0px;">
+                    <strong>Cảnh báo!</strong> Công ty con không được phép mua hàng từ nhà cung cấp ngoài.
+                </div>
+            </xpath>
+            
+            <field name="partner_id" position="attributes">
+                <attribute name="context">{'res_partner_search_mode': 'supplier', 'show_external_vendor_warning': True}</attribute>
+            </field>
+        </field>
+    </record>
+    
+    <!-- Thêm bộ lọc nhà cung cấp -->
+    <record id="view_res_partner_filter_inherit" model="ir.ui.view">
+        <field name="name">res.partner.select.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='supplier']" position="after">
+                <filter string="Nhà cung cấp ngoài" name="external_vendor" domain="[('is_external_vendor', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

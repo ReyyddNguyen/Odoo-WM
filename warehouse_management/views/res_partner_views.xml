@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='sales_purchases']" position="inside">
+                <group string="Cấu hình công ty">
+                    <field name="is_parent_company"/>
+                    <field name="is_subsidiary"/>
+                    <field name="is_external_vendor"/>
+                    <field name="parent_company_id" invisible="not is_subsidiary" required="is_subsidiary"/>
+                </group>
+            </xpath>
+            
+            <!-- Thêm trường tọa độ GPS và các tính năng liên quan -->
+            <xpath expr="//field[@name='street2']" position="after">
+                <label for="gps_coordinates" string="GPS Coordinates"/>
+                <div class="o_row" name="gps_coordinates">
+                    <field name="latitude" string="Vĩ độ" class="oe_inline"/>
+                    <span class="mx-3">-</span>
+                    <field name="longitude" string="Kinh độ" class="oe_inline"/>
+                    <button name="action_get_gps_coordinates" string="Get Coordinates" type="object" 
+                            class="btn-secondary" icon="fa-globe"
+                            help="Get GPS coordinates based on address"/>
+                </div>
+                <button name="action_view_on_map" string="View on Map" type="object" 
+                        class="btn-primary" 
+                        attrs="{'invisible': ['|', ('latitude', '=', 0.0), ('longitude', '=', 0.0)]}"
+                        help="View this address on a map"/>
+            </xpath>
+            
+            <!-- Add GPS tab in notebook -->
+            <xpath expr="//notebook" position="inside">
+                <page string="GPS &amp; Warehouse Routing" name="gps_routing" 
+                      attrs="{'invisible': ['&amp;', ('latitude', '=', 0.0), ('longitude', '=', 0.0)]}">
+                    <group>
+                        <group string="GPS Coordinates">
+                            <field name="latitude" string="Latitude"/>
+                            <field name="longitude" string="Longitude"/>
+                            <button name="action_test_warehouse_distance" string="Calculate Warehouse Distances" 
+                                    type="object" class="btn-primary"
+                                    help="Calculate distance to all active warehouses"/>
+                        </group>
+                        <group string="Nearest Warehouses" 
+                               attrs="{'invisible': ['|', ('latitude', '=', 0.0), ('longitude', '=', 0.0)]}">
+                            <!-- This will be filled dynamically -->
+                        </group>
+                    </group>
+                    <group string="Map View" 
+                           attrs="{'invisible': ['|', ('latitude', '=', 0.0), ('longitude', '=', 0.0)]}">
+                        <div class="o_map_container">
+                            <!-- Map placeholder - will be replaced by JavaScript -->
+                            <div class="alert alert-info">
+                                GPS coordinates available. You can view this location on a map using the "View on Map" button.
+                            </div>
+                        </div>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Add filter for partners with GPS coordinates -->
+    <record id="view_res_partner_filter_inherit" model="ir.ui.view">
+        <field name="name">res.partner.search.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='supplier']" position="after">
+                <filter string="Has GPS Coordinates" name="has_gps" domain="['&amp;', ('latitude', '!=', 0.0), ('longitude', '!=', 0.0)]"/>
+                <filter string="Parent Company" name="parent_company" domain="[('is_parent_company', '=', True)]"/>
+                <filter string="Subsidiary" name="subsidiary" domain="[('is_subsidiary', '=', True)]"/>
+                <filter string="External Vendor" name="external_vendor" domain="[('is_external_vendor', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

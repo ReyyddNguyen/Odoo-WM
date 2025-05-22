@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Default stock.scrap.category records -->
+        <record id="scrap_category_defective" model="stock.scrap.category">
+            <field name="name">Sản phẩm lỗi</field>
+            <field name="code">DEF</field>
+            <field name="default_scrap_type">disposal</field>
+        </record>
+        
+        <record id="scrap_category_damaged" model="stock.scrap.category">
+            <field name="name">Sản phẩm hư hỏng</field>
+            <field name="code">DAM</field>
+            <field name="default_scrap_type">repair</field>
+        </record>
+        
+        <record id="scrap_category_expired" model="stock.scrap.category">
+            <field name="name">Sản phẩm hết hạn</field>
+            <field name="code">EXP</field>
+            <field name="default_scrap_type">disposal</field>
+        </record>
+        
+        <record id="scrap_category_vendor_return" model="stock.scrap.category">
+            <field name="name">Trả lại nhà cung cấp</field>
+            <field name="code">VEN</field>
+            <field name="default_scrap_type">return</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='sales_purchases']" position="inside">
+                <group string="Cấu hình công ty">
+                    <field name="is_parent_company"/>
+                    <field name="is_subsidiary"/>
+                    <field name="is_external_vendor"/>
+                </group>
+            </xpath>
+            
+            <xpath expr="//field[@name='street2']" position="after">
+                <field name="latitude" string="Vĩ độ"/>
+                <field name="longitude" string="Kinh độ"/>
+            </xpath>
+        </field>
+    </record>
+</odoo> 
