@@ -93,7 +93,7 @@ Automatically selects the warehouse closest to the customer's location for order
 - New: stock.scrap.category
 
 ## Authors
-- Your Company
+- Group 1
 
 ## Maintainers
-- Your Company
+- Group 1
